@@ -206,10 +206,11 @@ battery.charge and battery.charge.low
 </li><li class="listitem">
 battery.runtime and battery.runtime.low
 </li></ul></div></li><li class="listitem"><p class="simpara">
-The upsmon master notices and sets "FSD" — the "forced shutdown"
-   flag to tell all slave systems that it will soon power down the load.
-</p><p class="simpara">(If you have no slaves, skip to step 6)</p></li><li class="listitem"><p class="simpara">
-upsmon slave systems see "FSD" and:
+The upsmon primary notices and sets "FSD" — the "forced shutdown"
+   flag to tell all secondary systems that it will soon power down
+   the load.
+</p><p class="simpara">(If you have no secondary systems, skip to step 6)</p></li><li class="listitem"><p class="simpara">
+upsmon secondary systems see "FSD" and:
 </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 generate a NOTIFY_SHUTDOWN event
 </li><li class="listitem">
@@ -219,12 +220,12 @@ call their SHUTDOWNCMD
 </li><li class="listitem">
 disconnect from upsd
 </li></ul></div></li><li class="listitem">
-The upsmon master system waits up to HOSTSYNC seconds (typically 15)
-   for the slaves to disconnect from upsd.  If any are connected after
-   this time, upsmon stops waiting and proceeds with the shutdown
-   process.
+The upsmon primary system waits up to HOSTSYNC seconds (typically 15)
+   for the secondary systems to disconnect from upsd.  If any are still
+   connected after this time, upsmon primary stops waiting and proceeds
+   with the shutdown process.
 </li><li class="listitem"><p class="simpara">
-The upsmon master:
+The upsmon primary:
 </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 generates a NOTIFY_SHUTDOWN event
 </li><li class="listitem">
@@ -241,7 +242,7 @@ init then runs your shutdown script.  This checks for the
    POWERDOWNFLAG, finds it, and tells the UPS driver(s) to power off
    the load.
 </li><li class="listitem">
-The system loses power.
+All the systems lose power.
 </li><li class="listitem">
 Time passes.  The power returns, and the UPS switches back on.
 </li><li class="listitem">
@@ -250,8 +251,8 @@ All systems reboot and go back to work.
 to upsd and use this user name (in brackets) and password to
 authenticate.  This example is for a user called "monuser":</p><pre class="literallayout">[monuser]
         password = mypass
-        upsmon master
-        # or upsmon slave</pre><p>References: <a class="ulink" href="../man/upsd.html" target="_top">upsd(8)</a>, <a class="ulink" href="../man/upsd.users.html" target="_top">upsd.users(5)</a></p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_reloading_the_data_server"></a>Reloading the data server</h5></div></div></div><p>Reload upsd.  Depending on your configuration, you may be able to
+        upsmon primary
+        # or upsmon secondary</pre><p>References: <a class="ulink" href="../man/upsd.html" target="_top">upsd(8)</a>, <a class="ulink" href="../man/upsd.users.html" target="_top">upsd.users(5)</a></p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_reloading_the_data_server"></a>Reloading the data server</h5></div></div></div><p>Reload upsd.  Depending on your configuration, you may be able to
 do this without stopping upsd:</p><pre class="literallayout">upsd -c reload</pre><p>If that doesn’t work (check the syslog), just restart it:</p><pre class="literallayout">upsd -c stop
 upsd</pre><div class="note" style="margin-left: 0; margin-right: 10%;"><h3 class="title">Note</h3><p>if you want to make reloading work later, see the entry in the
 <a class="ulink" href="FAQ.html" target="_top">FAQ</a> about starting upsd as a different user.</p></div></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_power_off_flag_file"></a>Power Off flag file</h5></div></div></div><p>Set the POWERDOWNFLAG location for upsmon.</p><p>In upsmon.conf, add a POWERDOWNFLAG directive with a filename.
@@ -262,15 +263,19 @@ by the group and not world.  This file contains passwords that could be used by
 an attacker to start a shutdown, so keep it secure.</p><pre class="literallayout">chown root:nut upsmon.conf
 chmod 0640 upsmon.conf</pre><p>This step has been placed early in the process so you secure this file before
 adding sensitive data in the next step.</p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_create_a_monitor_directive_for_upsmon"></a>Create a MONITOR directive for upsmon</h5></div></div></div><p>Edit upsmon.conf and create a MONITOR line with the UPS definition
-(&lt;upsname&gt;@&lt;hostname&gt;), username and password from the <a class="link" href="ar01s06.html#NUT_user_creation" title="NUT user creation">NUT user creation</a>
-step, and the master or slave setting.</p><p>If it’s the master (i.e., it’s connected to this UPS directly):</p><pre class="literallayout">MONITOR myupsname@mybox 1 monuser mypass master</pre><p>If it’s just monitoring this UPS over the network, and some other system is the
-master:</p><pre class="literallayout">MONITOR myupsname@mybox 1 monuser mypass slave</pre><p>The number "1" here is the power value.  This should always be set to 1 unless
-you have a very special (read: expensive) system with redundant power supplies.
-In such cases, refer to the User Manual:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+(&lt;upsname&gt;@&lt;hostname&gt;), username and password from the
+<a class="link" href="ar01s06.html#NUT_user_creation" title="NUT user creation">NUT user creation</a> step, and the
+"primary" or "secondary" setting.</p><p>If this system is the UPS manager (i.e., it’s connected to this UPS directly
+and can manage it using a suitable NUT driver), its upsmon is the primary:</p><pre class="literallayout">MONITOR myupsname@mybox 1 monuser mypass primary</pre><p>If it’s just monitoring this UPS over the network, and some other
+system is the primary, then this one is a secondary:</p><pre class="literallayout">MONITOR myupsname@mybox 1 monuser mypass secondary</pre><p>The number "1" here is the power value.  This should always be set
+to 1 unless you have a very special (read: expensive) system with
+redundant power supplies. In such cases, refer to the User Manual:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 <a class="link" href="ar01s06.html#BigServers" title="6.5. Typical setups for big servers with UPS redundancy">typical setups for big servers</a>,
 </li><li class="listitem">
 <a class="link" href="ar01s06.html#DataRoom" title="6.4. Typical setups for enterprise networks and data rooms">typical setups for data rooms</a>.
-</li></ul></div><p>References: <a class="ulink" href="../man/upsmon.html" target="_top">upsmon(8)</a>, <a class="ulink" href="../man/upsmon.conf.html" target="_top">upsmon.conf(5)</a></p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_define_a_shutdowncmd_for_upsmon"></a>Define a SHUTDOWNCMD for upsmon</h5></div></div></div><p>Still in upsmon.conf, add a directive that tells upsmon how to shut down your
+</li></ul></div><p>Note that the power value may also be 0 for a monitoring system which
+only observes the UPS status but is not impacted by its power events,
+and so does not shut down when the UPS does.</p><p>References: <a class="ulink" href="../man/upsmon.html" target="_top">upsmon(8)</a>, <a class="ulink" href="../man/upsmon.conf.html" target="_top">upsmon.conf(5)</a></p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_define_a_shutdowncmd_for_upsmon"></a>Define a SHUTDOWNCMD for upsmon</h5></div></div></div><p>Still in upsmon.conf, add a directive that tells upsmon how to shut down your
 system.  This example seems to work on most systems:</p><pre class="literallayout">SHUTDOWNCMD "/sbin/shutdown -h +0"</pre><p>Notice the presence of "quotes" here to keep it together.</p><p>If your system has special needs, you may want to set this to a script which
 does local shutdown tasks before calling init.</p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_start_upsmon"></a>Start upsmon</h5></div></div></div><pre class="literallayout">upsmon</pre><p>If it complains about something, then check your configuration.</p><p>On operating systems with service management frameworks, the monitoring client
 life-cycle is managed by <code class="literal">nut-monitor</code> service.</p></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="_checking_upsmon"></a>Checking upsmon</h5></div></div></div><p>Look for messages in the syslog to indicate success.  It should look something
@@ -366,9 +371,9 @@ the wiring is such that it doesn’t actually feed it.</p><p>Once you identify a
 programs need to be run for monitoring:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 A: driver and upsd
 </li><li class="listitem">
-B: upsmon (as slave)
+B: upsmon (in secondary mode)
 </li><li class="listitem">
-C: driver, upsd, and upsmon (as master)
+C: driver, upsd, and upsmon (in primary mode, as the UPS manager)
 </li></ul></div><p>To further complicate things, you can have a system that is hooked to
 multiple UPSes, but only depends on one for power.  This particular
 situation makes it an "A" relative to one UPS, and a "C" relative to the
@@ -377,21 +382,24 @@ or share the communication load between several upsd instances.</p></div><p><spa
 power feed, see the next section for information on how to handle it
 properly.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="BigServers"></a>6.5. Typical setups for big servers with UPS redundancy</h3></div></div></div><p>By using multiple MONITOR statements in upsmon.conf, you can configure an
 environment where a large machine with redundant power monitors multiple
-separate UPSes.</p><p><span class="inlinemediaobject"><img src="images/bigbox.png" alt="images/bigbox.png" /></span></p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_example_configuration"></a>Example configuration</h4></div></div></div><p>For the examples in this section, we will use a server with four power supplies
-installed.</p><p>Two UPS, <span class="emphasis"><em>Alpha</em></span> and <span class="emphasis"><em>Beta</em></span>, are each driving two of the power supplies.
+separate UPSes.</p><p><span class="inlinemediaobject"><img src="images/bigbox.png" alt="images/bigbox.png" /></span></p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_example_configuration"></a>Example configuration</h4></div></div></div><p>For the examples in this section, we will use a server with four power
+supplies installed and locally running the full NUT stack, including
+<code class="literal">upsmon</code> in primary mode — as the UPS manager.</p><p>Two UPSes, <span class="emphasis"><em>Alpha</em></span> and <span class="emphasis"><em>Beta</em></span>, are each driving two of the power supplies
+(by adding up, we know about the four power supplies of the current system).
 This means that either <span class="emphasis"><em>Alpha</em></span> <span class="strong"><strong>or</strong></span> <span class="emphasis"><em>Beta</em></span> can totally shut down and the
-server will be able to keep running.</p><p>The upsmon.conf configuration that reflect this is the following:</p><pre class="literallayout">MONITOR ups-alpha@myhost 2 monuser mypass master
-MONITOR ups-beta@myhost 2 monuser mypass master
+server will be able to keep running.</p><p>The upsmon.conf configuration that reflect this is the following:</p><pre class="literallayout">MONITOR ups-alpha@myhost 2 monuser mypass primary
+MONITOR ups-beta@myhost 2 monuser mypass primary
 MINSUPPLIES 2</pre><p>With that configuration, upsmon will only shut down when both UPS reaches
 a critical (on battery + low battery) condition, since <span class="emphasis"><em>Alpha</em></span> and <span class="emphasis"><em>Beta</em></span>
 provide the same power value.</p><p>As an added bonus, this means you can move a running server from one UPS
-to another (for maintenance purpose for example) without bringing it down since
-the minimum power will be provided at all times.</p><p>The MINSUPPLIES line tells upsmon that we need at least 2 power supplies
+to another (for maintenance purpose for example) without bringing it down
+since the minimum sufficient power will be provided at all times.</p><p>The MINSUPPLIES line tells upsmon that we need at least 2 power supplies
 to be receiving power from a good UPS (on line or on battery, just not
 on battery and low battery).</p><div class="note" style="margin-left: 0; margin-right: 10%;"><h3 class="title">Note</h3><p>we could have used a <span class="emphasis"><em>Power Value</em></span> of 1 for both UPS, and MINSUPPLIES
 set to 1 too. These values are purely arbitrary, so you are free to use your
 own rules. Here, we have linked these values to the number of power supplies
-that each UPS is feeding (2).</p></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_multiple_ups_shutdowns_ordering"></a>Multiple UPS shutdowns ordering</h4></div></div></div><p>If you have multiple UPSes connected to your system, chances are that you
+that each UPS is feeding (2) since this maps better to physical topology and
+allows to throw a third or fourth UPS into the mix without much headache.</p></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_multiple_ups_shutdowns_ordering"></a>Multiple UPS shutdowns ordering</h4></div></div></div><p>If you have multiple UPSes connected to your system, chances are that you
 need to shut them down in a specific order.  The goal is to shut down
 everything but the one keeping upsmon alive at first, then you do that one
 last.</p><p>To set the order in which your UPSes receive the shutdown commands, define
@@ -413,4 +421,4 @@ system with a 1:1 cord:supply ratio has more wires stuffed behind it, but
 it’s much easier to move things around since any given UPS drives a smaller
 percentage of the overall power.</p><p>More information can be found in the <a class="ulink" href="../user-manual.chunked/index.html" target="_top">NUT user manual</a>,
 and the various <a class="ulink" href="man/index.html" target="_top">user manual pages</a>.</p></div></div></div><div xmlns="" class="navfooter nut_footer"><hr />
-		Last updated 2020-12-21 18:08:07 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s05.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s07.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
+		Last updated 2021-05-26 00:31:13 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s05.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s07.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

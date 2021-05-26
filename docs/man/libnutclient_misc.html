@@ -771,17 +771,19 @@ void nutclient_device_forced_shutdown(NUTCLIENT_t client, const char* dev);</cod
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <strong>nutclient_authenticate()</strong> function authenticate the user.</p></div>
+<div class="paragraph"><p>The <strong>nutclient_authenticate()</strong> function authenticates the user.</p></div>
 <div class="paragraph"><p><em>login</em> is the user name.</p></div>
 <div class="paragraph"><p><em>passwd</em> is the user password.</p></div>
-<div class="paragraph"><p>The <strong>nutclient_logout()</strong> function disconnect gracefully from the server.</p></div>
-<div class="paragraph"><p>The <strong>nutclient_device_login()</strong> function log the fact that a system
+<div class="paragraph"><p>The <strong>nutclient_logout()</strong> function disconnects gracefully from the server.</p></div>
+<div class="paragraph"><p>The <strong>nutclient_device_login()</strong> function logs the fact that a system
 is drawing power from this UPS.</p></div>
-<div class="paragraph"><p>The <strong>nutclient_get_device_num_logins()</strong> function retrieve the number of clients
-which have been logged for this device.</p></div>
-<div class="paragraph"><p>The <strong>nutclient_device_master()</strong> function make sure that master-level
-functions like FSD are available if necessary.</p></div>
-<div class="paragraph"><p>The <strong>nutclient_device_forced_shutdown()</strong> function sets the "forced shutdown" flag on the device.</p></div>
+<div class="paragraph"><p>The <strong>nutclient_get_device_num_logins()</strong> function retrieves the number of
+clients which have been logged for this device.</p></div>
+<div class="paragraph"><p>The <strong>nutclient_device_master()</strong> function makes sure that primary-mode
+functions like FSD are available if necessary. (Note: API change may be
+pending to rename/alias the deprecated function name)</p></div>
+<div class="paragraph"><p>The <strong>nutclient_device_forced_shutdown()</strong> function sets the "forced shutdown"
+flag on the device.</p></div>
 <div class="paragraph"><p><em>dev</em> is the device name.</p></div>
 </div>
 </div>
@@ -795,7 +797,7 @@ functions like FSD are available if necessary.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-04 00:17:49 CET -- Network UPS Tools 2.7.4.1
+Last updated 2021-05-26 02:29:53 CEST -- Network UPS Tools 2.7.4.1
 </div>
 </div>
 </body>

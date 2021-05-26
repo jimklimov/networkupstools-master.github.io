@@ -111,15 +111,31 @@ in your system’s startup scripts.</p><p><code class="literal">upsd</code> shou
 of status information for the monitoring clients like <code class="literal">upsmon</code>.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="_monitoring_client"></a>2.10. Monitoring client</h3></div></div></div><p><code class="literal">upsmon</code> provides the essential feature that you expect to find in UPS
 monitoring software: safe shutdowns when the power fails.</p><p>In the layered scheme of NUT software, it is a client.  It has this
 separate section in the documentation since it is so important.</p><p>You configure it by telling it about UPSes that you want to monitor in
-upsmon.conf.  Each UPS can be defined as one of two possible types:</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_master"></a>Master</h4></div></div></div><p>This UPS supplies power to the system running <code class="literal">upsmon</code>, and this system is also
-responsible for shutting it down when the battery is depleted.  This occurs
-after any slave systems have disconnected safely.</p><p>If your UPS is plugged directly into a system’s serial port, the <code class="literal">upsmon</code>
-process on that system should define that UPS as a master.</p><p>For a typical home user, there’s one computer connected to one UPS.
-That means you run a driver, <code class="literal">upsd</code>, and <code class="literal">upsmon</code> in master mode.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_slave"></a>Slave</h4></div></div></div><p>This UPS may supply power to the system running <code class="literal">upsmon</code>, but this system can’t
-shut it down directly.</p><p>Use this mode when you run multiple computers on the same UPS.  Obviously, only
-one can be connected to the serial port on the UPS, and that system is the
-master.  Everything else is a slave.</p><p>For a typical home user, there’s one computer connected to one UPS.
-That means you run a driver, upsd, and upsmon in master mode.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_additional_information"></a>Additional Information</h4></div></div></div><p>More information on configuring upsmon can be found in these places:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+upsmon.conf.  Each UPS can be defined as one of two possible types:
+a "primary" or "secondary".</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_primary"></a>Primary</h4></div></div></div><p>The monitored UPS possibly supplies power to this system running <code class="literal">upsmon</code>,
+but more importantly — this system can manage the UPS (typically, this
+instance of <code class="literal">upsmon</code> runs on the same system as the <code class="literal">upsd</code> and driver(s)):
+it is capable and responsible for shutting it down when the battery is
+depleted (or in another approach, lingering to deplete it or to tell the
+UPS to reboot its load after too much time has elapsed and this system
+is still alive — meaning wall power returned at a  "wrong" moment).</p><p>The shutdown of this (primary) system itself, as well as eventually an
+UPS shutdown, occurs after any secondary systems ordered to shut down
+first have disconnected, or a critical urgency threshold was passed.</p><p>If your UPS is plugged directly into a system’s serial or USB port, the
+<code class="literal">upsmon</code> process on that system should define its relation to that UPS
+as a primary. It may be more complicated for higher-end UPSes with a
+shared network management capability (typically via SNMP) or several
+serial/USB ports that can be used simultaneously, and depends on what
+vendors and drivers implement. Setups with several competing primaries
+(for redundancy) are technically possible, if each one runs its own
+full stack of NUT, but results can be random (currently NUT does not
+provide a way to coordinate several entities managing the same device).</p><p>For a typical home user, there’s one computer connected to one UPS.
+That means you would run on the same computer the whole NUT stack — a suitable driver, <code class="literal">upsd</code>, and <code class="literal">upsmon</code> in primary mode.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_secondary"></a>Secondary</h4></div></div></div><p>The monitored UPS may supply power to the system running <code class="literal">upsmon</code> (or
+alternatively, it may be a monitoring station with zero PSUs fed by
+that UPS), but more importantly, this system can’t manage the UPS — e.g. shut it down directly (through a locally running NUT driver).</p><p>Use this mode when you run multiple computers on the same UPS.
+Obviously, only one can be connected to the serial or USB port
+on a typical UPS, and that system is the primary. Everything
+else is a secondary.</p><p>For a typical home user, there’s one computer connected to one UPS.
+That means you run a driver, <code class="literal">upsd</code>, and <code class="literal">upsmon</code> in primary mode.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_additional_information"></a>Additional Information</h4></div></div></div><p>More information on configuring upsmon can be found in these places:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 The <a class="ulink" href="../man/upsmon.html" target="_top">upsmon(8)</a> man page
 </li><li class="listitem">
 <a class="link" href="ar01s06.html#BigServers" title="6.5. Typical setups for big servers with UPS redundancy">Typical setups for big servers</a>
@@ -221,4 +237,4 @@ the <a class="ulink" href="../developer-guide.chunked/index.html" target="_top">
 the <a class="ulink" href="../packager-guide.chunked/index.html" target="_top">Packager Guide</a>.
 </li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="_acknowledgements_contributions"></a>2.17. Acknowledgements / Contributions</h3></div></div></div><p>The many people who have participated in creating and improving NUT are
 listed in the user manual <a class="link" href="apb.html" title="B. Acknowledgements / Contributions">acknowledgements appendix</a>.</p></div></div><div xmlns="" class="navfooter nut_footer"><hr />
-		Last updated 2020-12-21 18:08:07 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s01.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
+		Last updated 2021-05-26 00:31:13 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s01.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

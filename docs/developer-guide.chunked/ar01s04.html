@@ -118,7 +118,7 @@ BOOST   -- UPS is boosting incoming voltage
 FSD     -- Forced Shutdown (restricted use, see the note below)</pre><p>Anything else will not be recognized by the usual clients.  Coordinate
 with the nut-upsdev list before creating something new, since there will be
 duplication and ugliness otherwise.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><h3 class="title">Note</h3><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-upsd injects <code class="literal">FSD</code> by itself following that command by a master upsmon
+upsd injects <code class="literal">FSD</code> by itself following that command by a primary upsmon
 process.  Drivers must not set that value, apart from specific cases (see
 below).
 </li><li class="listitem">
@@ -2103,6 +2103,8 @@ If you need to edit the current status call this function with one of the NUT st
 </dd></dl></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_notes_2"></a>Notes</h4></div></div></div><p>You must put the generated files into the <code class="literal">drivers/</code> subdirectory, with the name of your subdriver preceded by <code class="literal">nutdrv_qx_</code>, and update <code class="literal">nutdrv_qx.c</code> by adding the appropriate <code class="literal">#include</code> line and by updating the definition of <code class="literal">subdriver_list</code>.</p><p>Please, make sure to add your driver in that list in a smart way: if your device supports also the basic commands used by the other subdrivers to claim a device, add something that is unique (i.e. not supported by the other subdrivers) to your device in your claim function and then add it on top of the slightly supported ones in that list.</p><p>You must also add the subdriver to <code class="literal">NUTDRV_QX_SUBDRIVERS</code> list variable in the <code class="literal">drivers/Makefile.am</code> and call "<code class="literal">autoreconf</code>" and/or "<code class="literal">./configure</code>" from the top level NUT directory.</p><p>You can then recompile <code class="literal">nutdrv_qx</code>, and start experimenting with the new subdriver.</p><p>For more details, have a look at the currently available subdrivers:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
 <code class="literal">nutdrv_qx_bestups.</code>{<code class="literal">c</code>,<code class="literal">h</code>}
 </li><li class="listitem">
+<code class="literal">nutdrv_qx_masterguard.</code>{<code class="literal">c</code>,<code class="literal">h</code>}
+</li><li class="listitem">
 <code class="literal">nutdrv_qx_mecer.</code>{<code class="literal">c</code>,<code class="literal">h</code>}
 </li><li class="listitem">
 <code class="literal">nutdrv_qx_megatec.</code>{<code class="literal">c</code>,<code class="literal">h</code>}
@@ -2121,4 +2123,4 @@ If you need to edit the current status call this function with one of the NUT st
 </li><li class="listitem">
 <code class="literal">nutdrv_qx_zinto.</code>{<code class="literal">c</code>,<code class="literal">h</code>}
 </li></ul></div></div></div></div><div xmlns="" class="navfooter nut_footer"><hr />
-		Last updated 2020-12-21 18:08:13 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s03.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
+		Last updated 2021-05-26 00:30:53 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s03.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

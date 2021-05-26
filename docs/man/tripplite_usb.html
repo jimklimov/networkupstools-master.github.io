@@ -875,6 +875,17 @@ This regular expression is used to match the USB bus (as seen in
 </p>
 </dd>
 <dt class="hdlist1">
+<strong>device</strong>
+</dt>
+<dd>
+<p>
+This regular expression is used to match the USB device (as seen in
+<code>/proc/bus/usb/devices</code> or lsusb(8); including leading zeroes).
+Note that device numbers are not guaranteed by the OS to be stable across
+re-boots or device re-plugging.
+</p>
+</dd>
+<dt class="hdlist1">
 <strong>product</strong>
 </dt>
 <dd>
@@ -967,14 +978,13 @@ so certain events may confuse the driver. If you observe any strange behavior,
 please re-run the driver with <code>-DDD</code> to increase the verbosity.</p></div>
 <div class="paragraph"><p>So far, the Tripp Lite UPSes do not seem to have a serial number or other
 globally unique identifier accessible through USB. Thus, when monitoring
-several Tripp Lite USB UPSes, you should use either the <em>bus</em> or <em>product</em>
-configuration options to uniquely specify which UPS a given driver instance
-should control.</p></div>
+several Tripp Lite USB UPSes, you should use either the <em>bus</em>, <em>device</em> or
+<em>product</em> configuration options to uniquely specify which UPS a given driver
+instance should control.</p></div>
 <div class="paragraph"><p>For instance, you can easily monitor an OMNIVS1000 and a SMART1500RM2U at the
 same time, since they have different USB Product ID strings. If you have two
-SMART1500RM2U units, you would have to find which USB bus number each unit is
-on (via lsusb(8)), which may result in ambiguities if the available USB ports
-are on the same bus.</p></div>
+SMART1500RM2U units, you would have to find which USB bus and device number
+each unit is on (via lsusb(8)).</p></div>
 <div class="paragraph"><p>Some of the SMART*2U models have an ID number, but because this ID is not
 exposed as a USB string descriptor, there is no easy way to use this ID to
 distinguish between multiple UPS units on a single machine. The UPS would need
@@ -1018,7 +1028,7 @@ Feldman (<a href="http://www.bradleyloritheo.com">http://www.bradleyloritheo.com
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-12-21 15:06:50 CET -- Network UPS Tools 2.7.4.1
+Last updated 2021-05-26 02:29:53 CEST -- Network UPS Tools 2.7.4.1
 </div>
 </div>
 </body>

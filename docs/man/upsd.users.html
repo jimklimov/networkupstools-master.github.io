@@ -771,15 +771,15 @@ name in brackets or EOF.  These users are independent of /etc/passwd.</p></div>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>[monmaster]
+<pre><code>[upswired]
         password = blah
-        upsmon master</code></pre>
+        upsmon primary</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>[monslave]
+<pre><code>[observer]
         password = abcd
-        upsmon slave</code></pre>
+        upsmon secondary</code></pre>
 </div></div>
 </div>
 </div>
@@ -847,7 +847,7 @@ of most of the known command names.</p></div>
 <dd>
 <p>
 Add the necessary actions for a upsmon process to work.  This is either
-set to "master" or "slave".
+set to "primary" or "secondary".
 </p>
 <div class="paragraph"><p>Do not attempt to assign actions to upsmon by hand, as you may miss
 something important.  This method of designating a "upsmon user" was
@@ -873,7 +873,7 @@ breaking existing installations.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-04 00:17:49 CET -- Network UPS Tools 2.7.4.1
+Last updated 2021-05-26 02:29:53 CEST -- Network UPS Tools 2.7.4.1
 </div>
 </div>
 </body>

@@ -753,7 +753,7 @@ For information about the core driver, see <a href="nutupsdrv.html">nutupsdrv(8)
 <div class="sect1">
 <h2 id="_supported_hardware">SUPPORTED HARDWARE</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <strong>nutdrv_qx</strong> driver is known to work with various UPSes from <em>Blazer</em>, <em>Energy Sistem</em>, <em>Fenton Technologies</em>, <em>General Electric</em>, <em>Mustek</em>, <em>Voltronic Power</em> (rebranded by many, many - have I said many? - others.. Long story short: if your UPS came with a software called <em>Viewpower</em>, chances are high that it works with this driver with one of the <a href="#_extra_arguments"><em>voltronic*</em> protocols or with the <em>mecer</em> one</a>) and many others.</p></div>
+<div class="paragraph"><p>The <strong>nutdrv_qx</strong> driver is known to work with various UPSes from <em>Blazer</em>, <em>Energy Sistem</em>, <em>Fenton Technologies</em>, <em>General Electric</em>, <em>Hunnox</em>, <em>Masterguard</em>, <em>Mustek</em>, <em>Powercool</em>, <em>Voltronic Power</em> (rebranded by many, many - have I said many? - others.. Long story short: if your UPS came with a software called <em>Viewpower</em>, chances are high that it works with this driver with one of the <a href="#_extra_arguments"><em>voltronic*</em> protocols or with the <em>mecer</em> one</a>) and many others.</p></div>
 <div class="paragraph"><p>The <a href="#_internet_resources">NUT compatibility table</a> lists all the known supported models.
 Keep in mind, however, that other models not listed there may also be supported, but haven&#8217;t been tested.</p></div>
 <div class="paragraph"><p>All devices with a serial interface and many with a USB interface are supported.</p></div>
@@ -801,7 +801,7 @@ If you set stayoff in <a href="ups.conf.html">ups.conf(5)</a> when FSD arises th
 <dd>
 <p>
 Skip autodetection of the protocol to use and only use the one specified.
-Supported values: <em>bestups</em>, <em>mecer</em>, <em>megatec</em>, <em>megatec/old</em>, <em>mustek</em>, <em>q1</em>, <em>voltronic</em>, <em>voltronic-qs</em>, <em>voltronic-qs-hex</em> and <em>zinto</em>.
+Supported values: <em>bestups</em>, <em>hunnox</em>, <em>masterguard</em>, <em>mecer</em>, <em>megatec</em>, <em>megatec/old</em>, <em>mustek</em>, <em>q1</em>, <em>voltronic</em>, <em>voltronic-qs</em>, <em>voltronic-qs-hex</em> and <em>zinto</em>.
 </p>
 <div class="paragraph"><p>Note that if you end up using the <em>q1</em> protocol, you may want to give a try to the <em>mecer</em>, <em>megatec</em> and <em>zinto</em> ones setting the <a href="#old-blazer-protocols-options"><strong>novendor</strong>/<strong>norating</strong> flags</a> (only one, or both).</p></div>
 </dd>
@@ -976,6 +976,21 @@ The acceptable range is <code>12..5940</code> seconds.
 <dd>
 <p>
 Set <a href="http://www.networkupstools.org/protocols/sola.html#_shutdown_set_command">shutdown mode functionality of Pin 1 and Pin 7</a> on the UPS DB9 communication port (Per Best Power&#8217;s EPS-0059) to <em>value</em> [<code>0..6</code>].
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_masterguard_protocol">MASTERGUARD PROTOCOL</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>slave_addr =</strong> <em>value</em>
+</dt>
+<dd>
+<p>
+Make the claim function verify it&#8217;s talking to the specified <em>slave address</em> (<strong>ups.id</strong>).
+Safeguard against talking to the wrong one of several identical UPSes on the same USB bus.
+Note that when changing <strong>ups.id</strong> (through <a href="upsrw.html">upsrw(8)</a>) the driver will continue to talk to the UPS with the new <em>slave address</em>, but won&#8217;t claim it again on restart until the <strong>slave_addr</strong> parameter is adjusted.
 </p>
 </dd>
 </dl></div>
@@ -1335,12 +1350,22 @@ The argument is a regular expression that must match the bus name where the UPS 
 </p>
 </dd>
 <dt class="hdlist1">
+<strong>device =</strong> <em>regex</em>
+</dt>
+<dd>
+<p>
+Select a UPS on a specific USB device or group of devices.
+The argument is a regular expression that must match the device name where the UPS is connected (e.g. <code>device="001"</code>, <code>device="00[1-2]"</code>).
+Note that device numbers are not guaranteed by the OS to be stable across re-boots or device re-plugging.
+</p>
+</dd>
+<dt class="hdlist1">
 <strong>subdriver =</strong> <em>string</em>
 </dt>
 <dd>
 <p>
 Select a serial-over-USB subdriver to use.
-You have a choice between <strong>cypress</strong>, <strong>fabula</strong>, <strong>fuji</strong>, <strong>ippon</strong>, <strong>krauler</strong>, <strong>phoenix</strong> and <strong>sgs</strong>.
+You have a choice between <strong>cypress</strong>, <strong>fabula</strong>, <strong>fuji</strong>, <strong>hunnox</strong>, <strong>ippon</strong>, <strong>krauler</strong>, <strong>phoenix</strong>, <strong>phoenixtec</strong>, <strong>sgs</strong> and <strong>snr</strong>.
 When using this option, it is mandatory to also specify the <strong>vendorid</strong> and <strong>productid</strong>.
 </p>
 </dd>
@@ -1352,6 +1377,14 @@ When using this option, it is mandatory to also specify the <strong>vendorid</st
 Apply the language ID workaround to the <strong>krauler</strong> subdriver.
 This is mandatory for some devices to work (LDLC, Dynamix and others).
 You must provide <strong>value</strong> (<code>0x409</code> or <code>0x4095</code>), according to your device entry in NUT hardware compatibility list (HCL).
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>noscanlangid</strong>
+</dt>
+<dd>
+<p>
+If this flag is set, don&#8217;t autoscan valid range for langid.
 </p>
 </dd>
 </dl></div>
@@ -1368,6 +1401,14 @@ Plus, the <strong>shutdown.return</strong> command ignores the values set in <em
 </p>
 </dd>
 <dt class="hdlist1">
+<strong><em>hunnox</em> subdriver</strong>
+</dt>
+<dd>
+<p>
+This protocol subdriver is closely related to <em>fabula</em> one, with a few tweaks for devices not directly supported by that driver.
+</p>
+</dd>
+<dt class="hdlist1">
 <strong><em>fuji</em> subdriver</strong>
 </dt>
 <dd>
@@ -1378,6 +1419,14 @@ Plus, the <strong>shutdown.return</strong> command ignores the values set in <em
 </dd>
 <dt class="hdlist1">
 <strong><em>krauler</em> subdriver</strong>
+</dt>
+<dd>
+<p>
+This subdriver, meant to be used with the <em>megatec</em> protocol, does <strong>not</strong> support the shutdown commands, i.e.: <strong>shutdown.return</strong>, <strong>shutdown.stayoff</strong> and <strong>load.off</strong>.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong><em>snr</em> subdriver</strong>
 </dt>
 <dd>
 <p>
@@ -1482,6 +1531,52 @@ Stop a running battery test.
 <dd>
 <p>
 Perform a battery test for the duration of <em>value</em> seconds (truncated to 60 seconds) [<code>60..5940</code>].
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_masterguard_protocol_2">MASTERGUARD PROTOCOL</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>beeper.enable</strong>
+</dt>
+<dd>
+<p>
+Enable the UPS beeper.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>beeper.disable</strong>
+</dt>
+<dd>
+<p>
+Disable the UPS beeper.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>test.battery.start</strong> <em>value</em>
+</dt>
+<dd>
+<p>
+Perform a battery test for the duration of <em>value</em> seconds (truncated to 60 seconds) [<code>0..5940</code>].
+This value is truncated to units of 6 seconds (less than 60 seconds) or 60 seconds (more than 60 seconds).
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>bypass.start</strong>
+</dt>
+<dd>
+<p>
+Put the UPS in bypass mode
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>bypass.stop</strong>
+</dt>
+<dd>
+<p>
+Take the UPS in normal mode
 </p>
 </dd>
 </dl></div>
@@ -1972,6 +2067,10 @@ However, some UPS models don&#8217;t allow this.</p></div>
 So, the <strong>beeper.toggle</strong> command may appear to have no effect in the status reported by the driver when, in fact, it is working fine.</p></div>
 <div class="paragraph"><p>The temperature and load value is known to be bogus in some models.</p></div>
 <div class="sect2">
+<h3 id="_masterguard_units">MASTERGUARD UNITS</h3>
+<div class="paragraph"><p>The driver is supposed to support both "new" A series (A700/1000/2000/3000 and their -19 cousins) and E series (E60/100/200) but was tested only on A due to lack of E hardware.</p></div>
+</div>
+<div class="sect2">
 <h3 id="_voltronic_qs_units">VOLTRONIC-QS UNITS</h3>
 <div class="paragraph"><p>Both <strong>load.off</strong> and <strong>shutdown.stayoff</strong> instant commands are known to work as expected (i.e. turn the load off indefinitely) only if mains is present, otherwise, as soon as mains returns the load will be powered.</p></div>
 <div class="paragraph"><p>After issuing a <strong>shutdown.return</strong> instant command, the UPS won&#8217;t wait <strong>ondelay</strong> before powering on the load, provided the following conditions are met:</p></div>
@@ -2270,7 +2369,8 @@ Arnaud Quette &lt;<a href="mailto:arnaud.quette@gmail.com">arnaud.quette@gmail.c
 John Stamp &lt;<a href="mailto:kinsayder@hotmail.com">kinsayder@hotmail.com</a>&gt;,
 Peter Selinger &lt;<a href="mailto:selinger@users.sourceforge.net">selinger@users.sourceforge.net</a>&gt;,
 Arjen de Korte &lt;<a href="mailto:adkorte-guest@alioth.debian.org">adkorte-guest@alioth.debian.org</a>&gt;,
-Alexander Gordeev &lt;<a href="mailto:lasaine@lvk.cs.msu.su">lasaine@lvk.cs.msu.su</a>&gt;</p></div>
+Alexander Gordeev &lt;<a href="mailto:lasaine@lvk.cs.msu.su">lasaine@lvk.cs.msu.su</a>&gt;,
+Edgar Fuß &lt;<a href="mailto:ef@math.uni-bonn.de">ef@math.uni-bonn.de</a>&gt;</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -2296,7 +2396,7 @@ Alexander Gordeev &lt;<a href="mailto:lasaine@lvk.cs.msu.su">lasaine@lvk.cs.msu.
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-12-21 15:06:50 CET -- Network UPS Tools 2.7.4.1
+Last updated 2021-05-26 02:29:53 CEST -- Network UPS Tools 2.7.4.1
 </div>
 </div>
 </body>

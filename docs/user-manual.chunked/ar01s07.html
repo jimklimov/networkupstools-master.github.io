@@ -109,14 +109,14 @@ upssched, you can now have this functionality.  Just set a timer for some
 length of time at ONBATT which will invoke a shutdown command if it elapses.
 Just be sure to cancel this timer if you go back ONLINE before then.</p><p>The best way to do this is to use the upsmon callback feature.  You can
 make upsmon set the "forced shutdown" (FSD) flag on the upsd so your
-slave systems shut down early too.  Just do something like this in your
-CMDSCRIPT:</p><pre class="literallayout">/sbin/upsmon -c fsd</pre><div class="note" style="margin-left: 0; margin-right: 10%;"><h3 class="title">Note</h3><p>the path to <code class="literal">upsmon</code> must be provided. The default for an installation
+secondary systems shut down early too.  Just do something like this
+in your CMDSCRIPT:</p><pre class="literallayout">/sbin/upsmon -c fsd</pre><div class="note" style="margin-left: 0; margin-right: 10%;"><h3 class="title">Note</h3><p>the path to <code class="literal">upsmon</code> must be provided. The default for an installation
 built from sources is <code class="literal">/usr/local/ups</code> (so <code class="literal">/usr/local/ups/sbin/upsmon</code>),
 while packaged installations will generally comply to
 <a class="ulink" href="http://refspecs.linuxfoundation.org/fhs.shtml" target="_top">FHS — Filesystem Hierarchy Standard</a>
 (so <code class="literal">/sbin/upsmon</code>).</p></div><p>It’s not a good idea to call your system’s shutdown routine directly
-from the CMDSCRIPT, since there’s no synchronization with the slave
-systems hooked to the same UPS.  FSD is the master’s way of saying
+from the CMDSCRIPT, since there’s no synchronization with the secondary
+systems hooked to the same UPS.  FSD is the primary’s way of saying
 "we’re shutting down <span class="strong"><strong>now</strong></span> like it or not, so you’d better get ready".</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_background"></a>Background</h4></div></div></div><p>This program was written primarily to fulfill the requests of users for
 the early shutdown scenario.  The "outboard" design of the program
 (relative to upsmon) was intended to reduce the load on the average
@@ -137,4 +137,4 @@ upsmon just called it, and you managed to catch the brief instance
 when there’s none running.  If there’s no process already running, there
 are no timers to cancel, and furthermore there is no need to start a
 clock-watcher.  As a result, it skips that step and exits sooner.</p></div></div></div><div xmlns="" class="navfooter nut_footer"><hr />
-		Last updated 2020-12-21 18:08:07 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s06.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
+		Last updated 2021-05-26 00:31:13 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s06.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ar01s08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

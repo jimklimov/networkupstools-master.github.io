@@ -47,9 +47,12 @@ compiled in).</p><pre class="literallayout">LISTEN 127.0.0.1
 LISTEN 192.168.50.1
 LISTEN ::1
 LISTEN 2001:0db8:1234:08d3:1319:8a2e:0370:7344</pre><p>This parameter will only be read at startup.  You’ll need to restart (rather
-than reload) <code class="literal">upsd</code> to apply any changes made here.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_firewall"></a>Firewall</h4></div></div></div><p>NUT has its own official IANA port: 3493/tcp.</p><p>The <code class="literal">upsmon</code> process on slave systems, as well as any other NUT client (such
-as <code class="literal">upsc</code>, <code class="literal">upscmd</code>, <code class="literal">upsrw</code>, NUT-Monitor, …) connects to the <code class="literal">upsd</code> process
-on the master system via this TCP port. The <code class="literal">upsd</code> process does not connect out.</p><p>You should use this to restrict network access.</p><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="UFW"></a>Uncomplicated Firewall (UFW) support</h5></div></div></div><p>NUT can tightly integrate with
+than reload) <code class="literal">upsd</code> to apply any changes made here.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_firewall"></a>Firewall</h4></div></div></div><p>NUT has its own official IANA port: 3493/tcp.</p><p>The <code class="literal">upsmon</code> process on secondary systems, as well as any other NUT client
+(such as <code class="literal">upsc</code>, <code class="literal">upscmd</code>, <code class="literal">upsrw</code>, NUT-Monitor, …) connects to the <code class="literal">upsd</code>
+process on the system which manages the UPS, via this TCP port. Usually an
+<code class="literal">upsmon</code> process runs on the latter system in "primary" mode for the devices
+connected to it.</p><p>The <code class="literal">upsd</code> process does not initiate outgoing connections.</p><p>Certain NUT drivers (for network-managed devices) can initiate their own
+connections to various ports according to corresponding vendor protocol.</p><p>You should use this to restrict network access.</p><div class="section"><div class="titlepage"><div><div><h5 class="title"><a id="UFW"></a>Uncomplicated Firewall (UFW) support</h5></div></div></div><p>NUT can tightly integrate with
 <a class="ulink" href="http://en.wikipedia.org/wiki/Uncomplicated_Firewall" target="_top">Uncomplicated Firewall</a>
 using the provided profile (nut.ufw.profile).</p><p>You must first install the profile on your system:</p><pre class="literallayout">$ cp nut.ufw.profile /etc/ufw/applications.d/</pre><p>To enable outside access to your local upsd, use:</p><pre class="literallayout">$ ufw allow NUT</pre><p>To restrict access to the network <span class="emphasis"><em>192.168.X.Y</em></span>, use:</p><pre class="literallayout">$ ufw allow from 192.168.0.0/16 to any app NUT</pre><p>You can also use graphical frontends, such as gui-ufw (gufw), ufw-kde
 or ufw-frontends.</p><p>For more information, refer to:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
@@ -64,7 +67,7 @@ UFW manual page, section APPLICATION INTEGRATION
 NUT username is allowed to connect from the client address through the
 <code class="literal">/etc/hosts.allow</code> and <code class="literal">/etc/hosts.deny</code> files.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><h3 class="title">Note</h3><p>this will only be done for commands that require the user to be logged
 into the server.</p></div><p><code class="literal">hosts.allow</code>:</p><pre class="literallayout">upsd : admin@127.0.0.1/32
-upsd : monslave@127.0.0.1/32 monslave@192.168.1.0/24</pre><p><code class="literal">hosts.deny</code>:</p><pre class="literallayout">upsd : ALL</pre><p>Further details are described in hosts_access(5).</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="_configuring_ssl"></a>10.5. Configuring SSL</h3></div></div></div><p>SSL is available as a build option (<code class="literal">--with-ssl</code>).</p><p>It encrypts sessions between upsd and clients, and can also be used to
+upsd : observer@127.0.0.1/32 observer@192.168.1.0/24</pre><p><code class="literal">hosts.deny</code>:</p><pre class="literallayout">upsd : ALL</pre><p>Further details are described in hosts_access(5).</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="_configuring_ssl"></a>10.5. Configuring SSL</h3></div></div></div><p>SSL is available as a build option (<code class="literal">--with-ssl</code>).</p><p>It encrypts sessions between upsd and clients, and can also be used to
 authenticate servers.</p><p>This means that stealing port 3493 from upsd will no longer net you interesting
 passwords.</p><p>Several things must happen before this will work, however. This chapter will
 present these steps.</p><p>SSL is available via two back-end libraries : NSS and OpenSSL (historically).
@@ -86,8 +89,8 @@ chmod 0755 &lt;certpath&gt;
 cp upsd.crt &lt;certpath&gt;/&lt;hash&gt;.0</pre><p>Example:</p><pre class="literallayout">mkdir /usr/local/ups/etc/certs
 chmod 0755 /usr/local/ups/etc/certs
 cp upsd.crt /usr/local/ups/etc/certs/0123abcd.0</pre><p>If you already have a file with that name in there, increment the
-0 until you get a unique filename that works.</p><p>If you have multiple client systems (like upsmon slaves), be sure
-to install this file on them as well.</p><p>We recommend making a directory under your existing confpath to
+0 until you get a unique filename that works.</p><p>If you have multiple client systems (like upsmon instances in
+secondary mode), be sure to install this file on them as well.</p><p>We recommend making a directory under your existing confpath to
 keep everything in the same place.  Remember the path you created,
 since you will need to put it in upsmon.conf later.</p><p>It must not be writable by unprivileged users, since someone could
 insert a new client certificate and fool upsmon into trusting a
@@ -251,7 +254,7 @@ confpath and the state path.  I recommend deleting the <span class="emphasis"><e
 <code class="literal">.pid</code> files without a lot of hassle.</p><p>You can also do this with your confpath and point <code class="literal">/usr/local/ups/etc</code> (or
 equivalent on your system) at <code class="literal">/chroot/nut/usr/local/ups/etc</code> unless you’re
 worried about something hurting the files inside that directory.  In that
-case, you should maintain a <span class="emphasis"><em>master</em></span> copy and push it into the chroot path
+case, you should maintain a <span class="emphasis"><em>golden</em></span> copy and push it into the chroot path
 after making changes.</p><p>The <code class="literal">upsdrvctl</code> itself does not chroot, so the <code class="literal">ups.conf</code> still needs to be
 in the usual confpath.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_upsmon"></a>upsmon</h4></div></div></div><p>This has not yet been applied to upsmon, since it can be quite
 complicated when there are notifiers that need to be run.  One
@@ -263,4 +266,4 @@ unprivileged child that listens for notify events
 unprivileged chrooted child that does network I/O
 </li></ul></div><p>This one is messy, and may not happen for some time, if ever.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="_config_files"></a>Config files</h4></div></div></div><p>You may now set <code class="literal">chroot=</code> and <code class="literal">user=</code> in the global section of <code class="literal">ups.conf</code>.</p><p>The <code class="literal">upsd</code> chroots before opening any config files, so there is no way to
 add support for that in <code class="literal">upsd.conf</code> at the present time.</p></div></div></div><div xmlns="" class="navfooter nut_footer"><hr />
-		Last updated 2020-12-21 18:08:07 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s09.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="apa.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
+		Last updated 2021-05-26 00:31:13 -- Network UPS Tools 2.7.4.1</div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s09.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="apa.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
