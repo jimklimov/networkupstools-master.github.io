@@ -919,9 +919,11 @@ behaviour quite a bit, depending on the model.</p></div>
     hibernate the UPS, and subsequently wake it up when the mains supply
     returns. <strong>The command doesn&#8217;t work if the UPS is running on mains.</strong>
 </p>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-"old" models
+"old" models: 
 </dt>
 <dd>
 <p>
@@ -931,7 +933,7 @@ behaviour quite a bit, depending on the model.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-"new" models
+"new" models: 
 </dt>
 <dd>
 <p>
@@ -943,6 +945,7 @@ behaviour quite a bit, depending on the model.</p></div>
 </p>
 </dd>
 </dl></div>
+</div></div>
 </dd>
 <dt class="hdlist1">
 <strong>CS</strong> (aka "force OB hack")
@@ -973,7 +976,7 @@ command if your UPS supports it (and is not too old, see below).</p></div>
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-"old" models
+"old" models: 
 </dt>
 <dd>
 <p>
@@ -988,7 +991,7 @@ command if your UPS supports it (and is not too old, see below).</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-"new" models
+"new" models: 
 </dt>
 <dd>
 <p>
@@ -1234,14 +1237,12 @@ shutdown. You might want to disable this condition entirely, when relying on
 such feature).</p></div>
 <div class="paragraph"><p>Simple example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="font-weight: bold"><span style="color: #000000">[apc]</span></span>
+<div class="content">
+<pre><code>[apc]
     ignorelb
-<span style="color: #009900">    override.battery.charge.low </span><span style="color: #990000">=</span> <span style="color: #993399">15</span>
-<span style="color: #009900">    override.battery.runtime.low </span><span style="color: #990000">=</span> <span style="color: #990000">-</span><span style="color: #993399">1</span></tt></pre></div></div>
+    override.battery.charge.low = 15
+    override.battery.runtime.low = -1</code></pre>
+</div></div>
 <div class="paragraph"><p>This would cause apcsmart to go into shutdown <em>only</em> if detected battery charge
 &lt; 15%. Runtime condition is always false in this example.</p></div>
 <div class="paragraph"><p>You could ask - why bother ? Well, the reason is already hinted above. APC units
@@ -1398,7 +1399,7 @@ new features, which is maintained by Michal Soltys &lt;<a href="mailto:soltys@zi
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-05-26 02:29:53 CEST -- Network UPS Tools 2.7.4.1
+Last updated 2021-09-26 10:50:10 CEST -- Network UPS Tools 2.7.4.1
 </div>
 </div>
 </body>

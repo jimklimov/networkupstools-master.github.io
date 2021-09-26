@@ -802,9 +802,14 @@ a list of all valid variables and associated values (you can later use <code>ups
 only to modify values of these variables), and has the same format as an
 <a href="upsc.html">upsc(8)</a> dump (<code>&lt;varname&gt;: &lt;value&gt;</code>). So you can easily create
 definition files from an existing UPS using <code>upsc &gt; file.dev</code>.</p></div>
-<div class="paragraph"><p>It can also be empty, in which case only a basic set of data is available:
-<code>device.*</code>, <code>driver.*</code>, <code>ups.mfr</code>, <code>ups.model</code>, <code>ups.status</code> as filled by
-the driver itself.</p></div>
+<div class="paragraph"><p>Note that the Network UPS project provides a DDL (Devices Dumps Library) at
+link:https://networkupstools.org/ddl/index.html with files which can be used
+for modelling real devices. Entries for the DDL library are prepared with the
+<code>./tools/nut-ddl-dump.sh</code> script from NUT sources instead of plain <code>upsc</code> to
+provide some other data points from other NUT clients as well.</p></div>
+<div class="paragraph"><p>The file can also be empty, in which case only a basic set of data is
+available: <code>device.*</code>, <code>driver.*</code>, <code>ups.mfr</code>, <code>ups.model</code>, <code>ups.status</code>
+as filled by the driver itself.</p></div>
 <div class="paragraph"><p>Some sample definition files are available in the <code>data</code> directory of the
 NUT source tree, and generally in the sysconfig directory of your system
 distribution.</p></div>
@@ -918,7 +923,7 @@ checking enforcement, as well as boundaries or enumeration definition.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-12-21 15:06:50 CET -- Network UPS Tools 2.7.4.1
+Last updated 2021-09-26 10:50:10 CEST -- Network UPS Tools 2.7.4.1
 </div>
 </div>
 </body>
